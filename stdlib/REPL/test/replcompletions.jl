@@ -1207,26 +1207,31 @@ end
 mktempdir() do path
     space_folder = randstring() * " α"
     dir = joinpath(path, space_folder)
-    dir_space = replace(space_folder, " " => "\\ ")
-
     mkdir(dir)
     cd(path) do
         open(joinpath(space_folder, "space .file"),"w") do f
-            s = Sys.iswindows() ? "rm $dir_space\\\\space" : "cd $dir_space/space"
+            dir_space = replace(space_folder, " " => "\\ ")
+            s = Sys.iswindows() ? "cd $dir_space\\\\space" : "cd $dir_space/space"
+            c, r = test_scomplete(s)
+            @test r == lastindex(s)-4:lastindex(s)
+            @test "space\\ .file" in c
+            # Also use shell escape rules within cmd backticks
+            s = "`$s"
             c, r = test_scomplete(s)
             @test r == lastindex(s)-4:lastindex(s)
             @test "space\\ .file" in c
 
-            s = Sys.iswindows() ? "cd(\"β $dir_space\\\\space" : "cd(\"β $dir_space/space"
+            # For normal strings, no shell escapes are used
+            s = "cd(" * repr(joinpath(path, space_folder, "space"))[1:end-1] # remove trailing "
             c, r = test_complete(s)
             @test r == lastindex(s)-4:lastindex(s)
             @test "space .file\"" in c
         end
         # Test for issue #10324
-        s = "cd(\"$dir_space"
+        s = "cd(\"$space_folder"
         c, r = test_complete(s)
-        @test r == 5:15
-        @test s[r] ==  dir_space
+        @test r == 5:14
+        @test s[r] == space_folder
 
         #Test for #18479
         for c in "'`@\$;&"
