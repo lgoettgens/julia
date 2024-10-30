@@ -233,18 +233,6 @@ STATIC_INLINE void jl_gc_multi_wb(const void *parent,
                                   const struct _jl_value_t *ptr) JL_NOTSAFEPOINT;
 
 
-// =========================================================================== //
-// Misc
-// =========================================================================== //
-
-// Allocates a new weak-reference, assigns its value and increments Julia allocation
-// counters. If thread-local allocators are used, then this function should allocate in the
-// thread-local allocator of the current thread.
-//
-// This function actually has a generic implementation in terms of jl_gc_new_weakref_th
-// but is kept in here for backwards compatibility with external code using this API.
-JL_DLLEXPORT jl_weakref_t *jl_gc_new_weakref(jl_value_t *value);
-
 #ifdef __cplusplus
 }
 #endif

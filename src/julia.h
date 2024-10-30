@@ -1171,6 +1171,14 @@ size_t mtarraylist_length(small_arraylist_t *_a) JL_NOTSAFEPOINT;
 void mtarraylist_add(small_arraylist_t *_a, void *elt, size_t idx) JL_NOTSAFEPOINT;
 void mtarraylist_push(small_arraylist_t *_a, void *elt) JL_NOTSAFEPOINT;
 
+// Allocates a new weak-reference, assigns its value and increments Julia allocation
+// counters. If thread-local allocators are used, then this function should allocate in the
+// thread-local allocator of the current thread.
+//
+// This function actually has a generic implementation in terms of jl_gc_new_weakref_th
+// but is kept in here for backwards compatibility with external code using this API.
+JL_DLLEXPORT jl_weakref_t *jl_gc_new_weakref(jl_value_t *value);
+
 // object accessors -----------------------------------------------------------
 
 #define jl_svec_len(t)              (((jl_svec_t*)(t))->length)
